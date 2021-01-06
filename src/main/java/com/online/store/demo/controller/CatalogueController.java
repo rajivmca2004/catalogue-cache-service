@@ -5,9 +5,13 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.online.store.demo.model.Catalogue;
@@ -27,8 +31,25 @@ public class CatalogueController {
 
 	@Cacheable(value = "catalogues", key = "#id")
 	@GetMapping("/catalogue/{id}")
-	public Optional<Catalogue> fetchProduct(@PathVariable String id) {
+	public Optional<Catalogue> fetchCatalogue(@PathVariable Long id) {
 		LOG.info("Getting user with ID {}.", id);
-		return catalogueRepository.findById(Long.valueOf(id));
+		return catalogueRepository.findById(id);
+	}
+	
+	//Updating Cache
+	@Cacheable(value = "catalogues", key = "#id")
+	@PutMapping("/catalogue/update}")
+	public Catalogue updateCatalogue(@RequestBody Catalogue catalogue) {
+		catalogueRepository.save(catalogue);
+		LOG.info("Updated Catalogue");
+		return catalogue;
+	}
+	
+	//Clear Cache
+	@CacheEvict(value = "catalogues", key = "#id")
+	@DeleteMapping("/catalogue/{id}")
+	public void deleteUserByID(@PathVariable Long id) {
+	  LOG.info("deleting catalogue with id {}", id);
+	  catalogueRepository.deleteById(Long.valueOf(id));
 	}
 }
