@@ -29,6 +29,7 @@ public class CatalogueController {
 	@Autowired
 	private CatalogueRepository catalogueRepository;
 
+	//Cache catalogue object for feteched id as a Redis catalogues key 
 	@Cacheable(value = "catalogues", key = "#id")
 	@GetMapping("/catalogue/{id}")
 	public Optional<Catalogue> fetchCatalogue(@PathVariable Long id) {
